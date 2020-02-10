@@ -17,9 +17,10 @@ def data():
         # sent data with curl to heroku app
         cpuPercentage = subprocess.getoutput("mpstat | awk '$12 ~ /[0-9.]+/ { print 100 - $12\"%\" }'")
         cpuTemp = subprocess.getoutput('echo {} | sudo -S {}'.format(pwd, 'tlp-stat -t | grep temp | awk \'{print $4}\''))
-        gpuTemp = subprocess.getoutput('nvidia-smi | grep C | awk "{print $2}"')
+        gpuTemp = subprocess.getoutput('nvidia-smi | grep N/A | awk \'$3 ~ /[1-9.]+/ {print $3}\'')
         storagePercent = subprocess.getoutput('df --output=pcent / | awk -F "%" "NR==2{print $1}"')
-        print('\nCPU percentage : {}\nCPU temperature : {} C\nGPU Temperature : {}\nStorage Percentage : used {}\n'.format(cpuPercentage, cpuTemp, gpuTemp, storagePercent))
+        print('\nCPU percentage : {}\nCPU temperature : {} C\nGPU Temperature : {}\nStorage Percentage : used{}\n'.format(cpuPercentage, cpuTemp, gpuTemp, storagePercent))
+        
     return data
 
 import os

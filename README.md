@@ -39,3 +39,5 @@ nvidia-smi
 mpstat
 
 df --output=pcent / | awk -F '%' 'NR==2{print $1}'
+
+sudo apt install libcurl4-openssl-dev libssl-dev
