@@ -6,6 +6,7 @@ import subprocess
 
 app = Flask(__name__)
 
+# server password SECRET
 pwd = '1910'
 
 @app.route("/data", methods=['POST'])
