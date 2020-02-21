@@ -18,16 +18,20 @@ def getStatus():
     cpuTemp = subprocess.getoutput('echo {} | sudo -S {}'.format(pwd, 'tlp-stat -t | grep temp | awk \'{print $4}\''))
     gpuTemp = subprocess.getoutput('nvidia-smi | grep N/A | awk \'$3 ~ /[1-9.]+/ {print $3}\'')
     storagePercent = subprocess.getoutput('df --output=pcent / | awk -F "%" "NR==2{print $1}"')
-    batteryStatus = subprocess.getoutput('echo {} | sudo -S {}'.format(pwd, 'tlp-stat -b | grep status | awk \'{print $3 $4}\''))
-    return cpuPercentage, cpuTemp, gpuTemp, storagePercent, batteryStatus
+    batteryStatus = subprocess.getoutput('echo {} | sudo -S {}'.format(pwd, 'tlp-stat -b | grep status | awk \'{print $3 " " $4}\''))
+    batCapacity = subprocess.getoutput('echo {} | sudo -S {}'.format(pwd, 'tlp-stat -b | grep Capacity | awk \'{print $3}\''))
+    sshLink = subprocess.getoutput('cat ../PS-01/sshLink.md')
+    return cpuPercentage, cpuTemp, gpuTemp, storagePercent, batteryStatus, batCapacity, sshLink
 
 def formatStatus(status):
     fstatus = {
             'cpu': '{}'.format(status[0].split('%')[0]),
             'cpuTemp': '{}'.format(status[1]),
-            'gpuTemp': '{}'.format(status[2]),
-            'storage': '{}'.format(status[3].split('%')[0]),
-            'batStatus': '{}'.format(status[4])
+            'gpuTemp': '{}'.format(status[2].split('C')[0]),
+            'storage': '{}'.format(status[3].split('%')[0].split(' ')[2]),
+            'batStatus': '{}'.format(status[4]),
+            'batCapacity': '{}'.format(status[5]),
+            'sshLink': '{}'.format(status[6])
         }
     
     return fstatus
@@ -86,6 +90,13 @@ def data():
 @app.route("/status", methods=['GET'])
 def status():
     return jsonify(formatStatus(getStatus()))
+
+@app.route("/get", methods=['POST'])
+def get():
+    data = json.loads(request.data, strict=False)
+    subprocess.call("echo {} > ../PS-01/sshLink.md".format(str(data)), shell=True)
+    return data
+
 
 import os
 if __name__ == "__main__":
